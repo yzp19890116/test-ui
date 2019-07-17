@@ -33,7 +33,8 @@
         },
         methods:{
             deleteUser:function(){
-
+                //此处修改的是app.vue传入的Array（理解为引用或者地址）在此处修改，会影响app,vue中的users内容。
+                this.users.pop()
             }
         }
     }
