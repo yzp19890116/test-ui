@@ -1,15 +1,43 @@
 <template>
   <div id="app">
-    <h1>这是我第一个vue脚手架项目</h1>
+    <app-header></app-header>
+    <users :users="users"></users>
+    <users :users="users"></users>
+    <app-footer></app-footer>
   </div>
 </template>
 
 <script>
+import Users from './components/Users.vue'
+import Header from './components/Header'
+import Footer from './components/Footer'
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    Users,
+    "app-header": Header,
+    "app-footer": Footer
+  },
+  data(){
+    return {
+      users: [
+        {name: "zhangsan", age: "10", show: false},
+        {name: "lisi", age: "11", show: false},
+        {name: "wangwu", age: "12", show: false},
+        {name: "zhaoliu", age: "13", show: false},
+        {name: "test1", age: "14", show: false},
+        {name: "test2", age: "15", show: false},
+        {name: "test3", age: "16", show: false}
+      ]
+    }
+  }
 }
 </script>
 
 <style>
-
+h1{
+  font-size: 15px;
+  color: purple
+}
 </style>
