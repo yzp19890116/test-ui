@@ -3,8 +3,8 @@
         <h1>users</h1>
         <ul>
             <li v-for="user of users">
-                <h2 @click="user.show = !user.show">{{user.name}}</h2>
-                <h3 v-show="user.show" >{{user.age}}</h3>
+                <h2>{{user.name}}</h2>
+                <h3>{{user.phone}}</h3>
             </li>
         </ul>
 
