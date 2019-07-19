@@ -15,7 +15,7 @@
 </template>
 
 <script>
-
+console.info()
 </script>
 
 <style scoped>
