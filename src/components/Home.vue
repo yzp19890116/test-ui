@@ -22,13 +22,12 @@
                     // {name: "test1", age: "14", show: false},
                     // {name: "test2", age: "15", show: false},
                     // {name: "test3", age: "16", show: false}
-                ],
-                commonTitle: "测试传值"
+                ]
             }
         },
         methods: {
             updateTitle: function (title) {
-                this.commonTitle = title
+                // this.commonTitle = title
             }
         },
         created () {
