@@ -29,7 +29,7 @@ module.exports = {
             app.get('/api/goods', (req, res) => {
                 res.json(goods)
             });
-            app.get('/api/ratings', (req, res) => {MsyzqzsscSsdw
+            app.get('/api/ratings', (req, res) => {
                 res.json(ratings)
             });
             app.get('/api/seller', (req, res) => {
