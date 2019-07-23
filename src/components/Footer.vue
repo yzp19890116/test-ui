@@ -1,7 +1,7 @@
 <template>
     <footer>
 <!--        <h1>{{copeRight}}-{{commonTitle}}</h1>-->
-        <h1>{{copeRight}}</h1>
+        <h1>{{copeRight}}-{{url}}</h1>
     </footer>
 </template>
 
@@ -16,7 +16,8 @@
         },
         data(){
             return {
-                copeRight: "@CopeRight 2019 Vue test"
+                copeRight: "@CopeRight 2019 Vue test",
+                url: process.env.VUE_APP_URL
             }
         }
     }

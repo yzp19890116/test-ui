@@ -24,8 +24,8 @@ import Email from '../components/about/contact/Email'
 Vue.use(VueRouter)
 
 const routes = [
-    {path:"/", name:"homeLink", components:{
-            defaule: Home,
+    {path:"/", name:"homeLink", components: {
+            default: Home,
             'delivery': Delivery,
             'history': History,
             'orderingGuide': OrderingGuide,
