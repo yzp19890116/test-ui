@@ -21,6 +21,10 @@ import OrderingGuide from '../components/about/OrderingGuide'
 import Phone from '../components/about/contact/Phone'
 import Email from '../components/about/contact/Email'
 
+//vuex联系先关的引入
+import ForbesList from '../components/vuex/ForbesList'
+
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -59,6 +63,7 @@ const routes = [
             ]
     },
     {path:"/helloword", component: HelloWord},
+    {path:"/vuex/forbesList", component: ForbesList},
     {path:"*", redirect:"/"}//设置如果前面的都没有匹配上，返回到根目录
 ]
 
