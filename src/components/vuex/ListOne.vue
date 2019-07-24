@@ -1,7 +1,7 @@
 <template>
     <div class="list-one">
         <ul>
-            <li v-for="person in personList">
+            <li v-for="person in saleList">
                 <span class="name">{{person.name}}</span>
                 <span class="price">{{person.price}}</span>
             </li>
@@ -11,7 +11,14 @@
 
 <script>
 export default{
-    props:["personList"],
+    computed: {
+        personList() {
+            return this.$store.state.personList
+        },
+        saleList(){
+            return this.$store.getters.saleList
+        }
+    },
     methods:{
 
     }
