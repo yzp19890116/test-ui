@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
+    strict: true,//设置成了严格模式，state中的数据只能通过mutations中的方法修改
     state:{
         personList: [
             {name: '马云', price: 200},
@@ -20,8 +21,24 @@ export const store = new Vuex.Store({
                     price: person.price / 2
                 }
             })
-            console.log(saleList)
             return saleList
         })
+    },
+    //同步方法
+    mutations: {
+        reducePrice: (state, payload) => {
+            state.personList.forEach(person => {
+                person.price -= payload
+            })
+        }
+    },
+    //异步方法
+    actions: {
+        reducePrice: (context, payload) =>{
+            setTimeout(function(){
+                context.commit("reducePrice", payload)
+            }, 3000)
+
+        }
     }
 })

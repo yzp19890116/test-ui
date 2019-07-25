@@ -6,6 +6,7 @@
                 <span class="price">{{person.price}}</span>
             </li>
         </ul>
+        <button @click="reducePrice(5)">降价</button>
     </div>
 </template>
 
@@ -20,7 +21,15 @@ export default{
         }
     },
     methods:{
-
+        reducePrice: function(amount){
+            // this.$store.state.personList.forEach(person => {
+            //     person.price -= 1
+            // })
+            //触发vuex,mutations中的方法,上面的方法也会生效，但是会在控制台报错
+            // this.$store.commit("reducePrice");
+            //触发vuex.actions中的方法
+            this.$store.dispatch('reducePrice', amount)
+        }
     }
 }
 </script>

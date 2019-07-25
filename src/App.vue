@@ -25,7 +25,7 @@
                 </div>
             </div>
             <!-- 底部 -->
-            <app-footer :commonTitle="commonTitle"></app-footer>
+            <app-footer></app-footer>
         </div>
 
     </div>
