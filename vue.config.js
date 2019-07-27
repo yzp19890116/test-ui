@@ -9,7 +9,7 @@ module.exports = {
     lintOnSave: false,//是否开启保存时eslint的校验
     //开发环境下的配置
     devServer: {
-        open: true,//启动后是否自动打开浏览器
+        open: false,//启动后是否自动打开浏览器
         host:'localhost',//主机域名
         port: 8081,//端口号
         https: false,//是否启动https协议

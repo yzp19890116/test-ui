@@ -37,7 +37,7 @@ export const store = new Vuex.Store({
         reducePrice: (context, payload) =>{
             setTimeout(function(){
                 context.commit("reducePrice", payload)
-            }, 3000)
+            }, 1000)
 
         }
     }
