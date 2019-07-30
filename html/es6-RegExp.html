@@ -119,7 +119,7 @@
     let re = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/u;
     console.log('1999-12-20'.replace(re, '$<day>/$<month>/$<year>'));
     //replace的第二个参数也可以是一个函数
-    let result = '2015-01-02'.replace(re, (
+    let result = '02015-01-02'.replace(re, (
        matched,//整个匹配结果 2015-01-02
        capture1,//第一组匹配结果   2015
        capture2,//第二组匹配结果   01
