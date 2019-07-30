@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<mate charset="UTF-8">
+	<title>学习ES6的let和const</title>
+</head>
+<body>
+</body>
+<script>
+	console.log("==============数组的解构赋值===================")
+	let[arr, [[ssArr], sunArr]] = [1, [[2], 3]];
+	console.log(arr);
+	console.log(sunArr);
+	console.log(ssArr);
+	
+	let[,,third] = ["test1","test2","test3"];
+	console.log(third);
+	
+	let[head, ...tail] = [1,2,3,4,5];
+	console.log(head+"_"+tail);
+	console.log(tail);//tail是一个数组，即使赋值只有两个或一个，如果是空数组，前undefined,后[]
+	
+	//不完全结构也是允许的
+	let[x,y] = [1,2,3];
+	console.log(x+"_"+y);//1_2
+	let[a,[b],c] = [1,[2,3],4];
+	console.info(a+"_"+b+"_"+c);//1_2_4
+	
+	//默认赋值
+	let [foo = true] = [];
+	console.log(foo);//true
+	let[x1, y1='b'] = ['a'];
+	console.log(x1+""+y1);
+	let[x2, y2='b'] = ['a', undefined];
+	console.log(x2+""+y2);//另个输出的是一致的，y都是undefined所以都使用默认值
+	
+	let[x3=1] = [undefined];
+	let[x4=1] = [null];
+	console.log(x3+"_"+x4);//ES6内部严格相等运算符===，判断是否优质，只有成员严格等于undefined时才会生效
+	
+	//如果默认值是一个表达式，这个表达式是惰性求值的，即只有在用到的时候才会求值
+	function fun(){
+		console.info("test1");
+	}
+	
+	let[x5=fun()] = [1];//[]//[1];
+	x5
+	
+	//对象的解构赋值
+	console.log("==============对象的解构赋值===================")
+	let{objx, objy} = {objy: 'y', objx: 'x'};
+	console.log(objx+"_"+objy);//和数组的解构赋值有个很大的区别数组是由顺序的，对象只要对象内容存在，就不存在顺序问题
+	
+	let{objx1, objz1} = {objx1: "x", objy1: "y"};
+	console.log(objx1+"_"+objz1);//如果解构失败变量值等于undefined
+	
+	//对象的解构赋值，可以很方便的将现有对象的方法赋值到某个变量
+	let{sin, cos} = Math;
+	
+	const {log} = console;
+	log("testConsoleLog");
+	
+	//如果变量名与属性名不一致,定义别名如下
+	let obj = {first: 'hello', last: 'word'};
+	let {first: f, last: l} = obj;
+	console.log(f+"_"+l);
+	
+	let obj2 = {
+		p:[
+			'Hello',
+			{y: 'Word'}
+		]
+	}
+	let {p: [objx2, {y:objy2}]} = obj2;
+	console.log(objx2+"_"+objy2);//此处p只是一个模式，不是变量，所以不能输出
+	
+	let {p, p: [objx3, {y:objy3}] } = obj2;
+	console.log(objx2+"_"+objy2+"_"+p);//此时p既作为模式，有作为变量，就可以做变量展示
+	
+	//对象的解构赋值，可以渠道继承的属性
+	const obj3 = {};
+	const obj4 = {foo: 'bar'};
+	
+	Object.setPrototypeOf(obj3, obj4);//obj3继承obj4的属性
+	
+	const { foo:foo1 } = obj3;
+	console.log(foo1);
+	
+	//字符串的解构赋值
+	console.log("==============字符串的解构赋值===================")
+	const[srtA, strB, strC, steD, strE] = "hello";//缺失的话解析为undefined
+
+	let {length: len} = "hello";
+	console.log(len);//类似数组对象都有length属性，因此还可以对属性进行解构赋值
+	
+	//布尔值的解构赋值
+	console.log("==============布尔值的解构赋值===================")
+	//解构时，如果等号右边是数值和布尔值，则会先转成对象, undefined和null无法转为对象，所以不能解构赋值
+	let {toString: s} = 123;
+	let {toString: s1} = true;
+	console.log(s === Number.prototype.toString);
+	console.log(s1 === Boolean.prototype.toString);
+	
+	//函数参数的解构赋值
+	console.log("==============函数参数的解构赋值===================")
+	function add([x, y]){
+		return x + y;
+	}
+	console.log(add([1,2]));//表面上参数是一个数组，但是传入参数的那一刻，数组蚕食就被解构成了变量x和y，所以能正常返回值
+	
+	console.log([[1,2], [3,4]].map(([a,b]) => a + b));
+	
+	//函数参数的解构也能使用默认值
+	function remove({x = 0, y = 0} = {}){
+		return [x, y];
+	}
+	
+	console.log(remove({x: 3, y: 4}));
+	console.log(remove({x: 3}));
+	console.log(remove({}));
+	console.log(remove());
+	
+	//上面的方法是为x、y分别默认值，此方法是给remove1方法默认参数，只有当传入参数的undefined时，才会使用默认参数
+	function remove1({x, y} = {x:0, y:0}){
+		return [x, y];
+	}
+	
+	console.log(remove1({x: 3, y: 4}));
+	console.log(remove1({x: 3}));
+	console.log(remove1({}));
+	console.log(remove1());
+	
+	//解构中的圆括号
+	console.log("==============解构中的圆括号===================")
+	
+	//以下情况不能使用圆括号
+	//1、变量声明语句
+	//let [(a)] = [1];
+	//let {x: {c}} = {}
+	
+	//2、函数参数
+	//function fun1([{z}]) {return z};
+	
+	//3、赋值语句的模式
+	//({p: a}) = { p: 2};
+	
+	//可以使用圆括号的情况就一种，赋值语句费模式部分可以使用,我试过全报错
+	//[(testa)] = [3];
+	//({p: (d)} = {});
+	//[(parseInt.prop)] = [3];
+	
+	//用途
+	console.log("==============解构用途===================")
+	
+	//1、交换变量值
+	let useX = 1;
+	let useY = 2;
+	
+	[x, y] = [y, x];
+	console.info(x+"_"+y);
+	
+	//2、从函数返回值
+	function example(){
+		return [1,2,3];
+	}
+	let[useA, useB, useC] = example();
+	console.log(useA+"_" + useB + "_" + useC);//返回数组
+	
+	function example1(){
+		return {
+			useA1: 1,
+			useB1: 2
+		}
+	}
+	let {useA1, useB1} = example1();
+	console.log(useA1+"_" + useB1);//返回数组
+	
+	//3、函数参数的定义
+	function useF([x, y, z]){
+		console.log(x+"_"+y+"_"+z);
+	}
+	useF([1,2,3]);
+	
+	function useF1({x1,y1,z1}){
+		console.log(x1+"_"+y1+"_"+z1);
+	}
+	useF1({x1:1,y1:2,z1:3});
+	
+	//4、提取json数据
+	let jsonData = {
+		id: 1,
+		status : "OK",
+		data: [1,2]
+	}
+	let{id, status, data: number} = jsonData;
+	console.log(id + "_" + status + "_" + number);
+	
+	//5、函数参数的默认值
+	/**Jquery.ajax = function(url, {
+		async = true,
+		beforeSend = function(){},
+		cache = true,
+		complete = function(){}
+	} = {}){
+	
+	}**/
+	
+	//6、遍历map结构
+	const map = new Map();
+	map.set('first', 'hello');
+	map.set('last','word');
+	
+	for(let [key, value] of map){
+		console.log(key+"_"+value);
+	}
+	
+	//输入模块的指定方法
+	//const { functionA, functionB} = require("source-map");//这个是项目中见过的
+	
+</script>
+</html>

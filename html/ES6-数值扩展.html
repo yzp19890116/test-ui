@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数值的扩展</title>
+</head>
+<body>
+
+</body>
+<script>
+    console.log("==================二进制和八进制表示法==================")
+    console.log(0b111110111 === 503);//二进制表达方式
+    console.log(0o767 === 503);//八进制表达方式
+    //转成十进制方法是Number
+    console.log(Number(0b111110111));
+    console.log(Number(0o767));
+
+    console.log("==================Number.isFinite(), Number.isNaN()==================")
+    //直接上例子，没什么可解释的
+    Number.isFinite(15); // true
+    Number.isFinite(0.8); // true
+    Number.isFinite(NaN); // false
+    Number.isFinite(Infinity); // false
+    Number.isFinite(-Infinity); // false
+    Number.isFinite('foo'); // false
+    Number.isFinite('15'); // false
+    Number.isFinite(true); // false
+
+    Number.isNaN(NaN) // true
+    Number.isNaN(Infinity) // false
+    Number.isNaN(15) // false
+    Number.isNaN('15') // false
+    Number.isNaN(true) // false
+    Number.isNaN(9/NaN) // true
+    Number.isNaN('true' / 0) // true
+    Number.isNaN('true' / 'true') // true
+
+    console.log("==================Number.parseInt(), Number.parseFloat() ==================")
+    //之前的parseInt 和 parseFloat 移植到Number对象上，行为不变.现两种都能用
+    console.log(parseInt('12.34'));
+    console.log(parseFloat('12.34#'));
+    console.log(Number.parseInt('12.34'));
+    console.log(Number.parseFloat('12.34#'));
+
+    console.log("==================Number.isInteger()==================")
+    Number.isInteger(25) // true
+    Number.isInteger(25.0) // true
+    Number.isInteger() // false
+    Number.isInteger(null) // false
+    Number.isInteger('15') // false
+    Number.isInteger(true) // false
+    //由于 JavaScript 采用 IEEE 754 标准，数值存储为64位双精度格式，数值精度最多可以达到 53 个二进制位（1 个隐藏位与 52 个有效位）。如果数值的精度超过这个限度，第54位及后面的位就会被丢弃，这种情况下，Number.isInteger可能会误判。
+    Number.isInteger(3.0000000000000002) // true
+    Number.isInteger(5E-324) // false
+    Number.isInteger(5E-325) // true
+
+    console.log("==================Number.EPSILON==================")
+    //Number.EPSILON实际上代表的是javaScript能表示的最小精度
+    console.log(Number.EPSILON === Math.pow(2, -52))
+    console.log(Math.pow(2, 2));
+    //最主要用于设置最小负担，解决浮点数的计算
+    function withinErrorMargin(left, right){
+        return Math.abs(left - right) < Number.EPSILON * Math.pow(2, 2)
+    }
+
+    console.log(0.1 + 0.2 === 0.3)
+    console.log(withinErrorMargin(0.1 + 0.2, 0.3))
+    console.log(0.1 * 0.2 === 0.02)
+    console.log(withinErrorMargin(0.1 * 0.2, 0.02))
+
+    console.log("==================安全整数和 Number.isSafeInteger()==================")
+    //JavaScript 能够准确表示的整数范围在-2^53到2^53之间（不含两个端点），超过这个范围，无法精确表示这个值。
+    console.log(Number.MAX_SAFE_INTEGER)//最大安全整数
+    console.log(Number.MAX_SAFE_INTEGER)//最小安全整数
+    Number.isSafeInteger('a') // false
+    Number.isSafeInteger(null) // false
+    Number.isSafeInteger(NaN) // false
+    Number.isSafeInteger(Infinity) // false
+    Number.isSafeInteger(-Infinity) // false
+
+    Number.isSafeInteger(3) // true
+    Number.isSafeInteger(1.2) // false
+    Number.isSafeInteger(9007199254740990) // true
+    Number.isSafeInteger(9007199254740992) // false
+
+    Number.isSafeInteger(Number.MIN_SAFE_INTEGER - 1) // false
+    Number.isSafeInteger(Number.MIN_SAFE_INTEGER) // true
+    Number.isSafeInteger(Number.MAX_SAFE_INTEGER) // true
+    Number.isSafeInteger(Number.MAX_SAFE_INTEGER + 1) // false
+
+    console.log("==================Math 对象的扩展==================")
+    console.log("==================Math.trunc()==================")
+    //Math.trunc()去除一个数的小数部分
+    Math.trunc(4.1) // 4
+    Math.trunc(4.9) // 4
+    Math.trunc(-4.1) // -4
+    Math.trunc(-4.9) // -4
+    Math.trunc(-0.1234) // -0
+    //对于非数值，Math.trunc内部使用Number方法将其先转为数值。
+    Math.trunc('123.456') // 123
+    Math.trunc(true) //1
+    Math.trunc(false) // 0
+    Math.trunc(null) // 0
+    //对于空值和无法截取整数的值，返回NaN。
+    Math.trunc(NaN);      // NaN
+    Math.trunc('foo');    // NaN
+    Math.trunc();         // NaN
+    Math.trunc(undefined) // NaN
+
+    //如果没有满足es6的环境考验用下面方法代替
+    Math.trunc = Math.trunc || function(numb){
+        return numb < 0 ? Math.ceil(numb) : Math.floor(numb)
+    }
+
+    console.log("==================Math.sign()==================")
+    //Math.sign()判断一个数是正数还是负数
+    Math.sign(-5) // -1
+    Math.sign(5) // +1
+    Math.sign(0) // +0
+    Math.sign(-0) // -0
+    Math.sign(NaN) // NaN
+
+    Math.sign('')  // 0
+    Math.sign(true)  // +1
+    Math.sign(false)  // 0
+    Math.sign(null)  // 0
+    Math.sign('9')  // +1
+    Math.sign('foo')  // NaN
+    Math.sign()  // NaN
+    Math.sign(undefined)  // NaN
+
+    //如果没有满足es6的环境考验用下面方法代替
+    Math.sign = Math.sign || function(numb){
+        numb = + numb;//转换成一个数字
+        if(number === 0 || isNaN(number)){
+            return number;
+        }
+        return number > 0 ? 1 : -1;
+
+    }
+
+    console.log("==================Math.cbrt()求一个数的立方根==================")
+    Math.cbrt(-1) // -1
+    Math.cbrt(0)  // 0
+    Math.cbrt(1)  // 1
+    Math.cbrt(2)  // 1.2599210498948734
+
+    Math.cbrt('8') // 2
+    Math.cbrt('hello') // NaN
+
+    //如果没有满足es6的环境考验用下面方法代替
+    Math.cbrt = Math.cbrt || function(numb){
+        var y = Math.pow(Math.abs(numb), 1/3);
+        return x < 0 ? -y : y;
+    }
+
+    console.log("==================Math.clz32()将数字转为32位无符号整数然后返回前面有几个0==================")
+    Math.clz32(0) // 32
+    Math.clz32(1) // 31
+    Math.clz32(1000) // 22
+    Math.clz32(0b01000000000000000000000000000000) // 1
+    Math.clz32(0b00100000000000000000000000000000) // 2
+
+    Math.clz32(0) // 32
+    Math.clz32(1) // 31
+    Math.clz32(1 << 1) // 30
+    Math.clz32(1 << 2) // 29
+    Math.clz32(1 << 29) // 2
+
+    Math.clz32(3.2) // 30
+    Math.clz32(3.9) // 30
+
+    Math.clz32() // 32
+    Math.clz32(NaN) // 32
+    Math.clz32(Infinity) // 32
+    Math.clz32(null) // 32
+    Math.clz32('foo') // 32
+    Math.clz32([]) // 32
+    Math.clz32({}) // 32
+    Math.clz32(true) // 31
+
+    console.log("==================Math.imul()方法返回两个数以 32 位带符号整数形式相乘的结果，返回的也是一个 32 位的带符号整数==================")
+    Math.imul(2, 4)   // 8
+    Math.imul(-1, 8)  // -8
+    Math.imul(-2, -2) // 4
+
+    (0x7fffffff * 0x7fffffff)|0 // 0
+    Math.imul(0x7fffffff, 0x7fffffff) // 1
+
+    console.log("==================Match.fround()方法返回一个数的32位单精度浮点数形式==================")
+    Math.fround(0)   // 0
+    Math.fround(1)   // 1
+    Math.fround(2 ** 24 - 1)   // 16777215
+
+    Math.fround(2 ** 24)       // 16777216
+    Math.fround(2 ** 24 + 1)   // 16777216
+
+    // 未丢失有效精度
+    Math.fround(1.125) // 1.125
+    Math.fround(7.25)  // 7.25
+
+    // 丢失精度
+    Math.fround(0.3)   // 0.30000001192092896
+    Math.fround(0.7)   // 0.699999988079071
+    Math.fround(1.0000000123) // 1
+
+    Math.fround(NaN)      // NaN
+    Math.fround(Infinity) // Infinity
+
+    Math.fround('5')      // 5
+    Math.fround(true)     // 1
+    Math.fround(null)     // 0
+    Math.fround([])       // 0
+    Math.fround({})       // NaN
+
+    Math.fround = Math.fround || function (x) {
+        return new Float32Array([x])[0];
+    };
+
+    console.log("==================Math.hypot()方法返回所有参数的平方和的平方根。==================")
+    Math.hypot(3, 4);        // 5
+    Math.hypot(3, 4, 5);     // 7.0710678118654755
+    Math.hypot();            // 0
+    Math.hypot(NaN);         // NaN
+    Math.hypot(3, 4, 'foo'); // NaN
+    Math.hypot(3, 4, '5');   // 7.0710678118654755
+    Math.hypot(-3);          // 3
+
+    console.log("==================对数方法，正余弦方法、指数运算符==================")
+</script>
+</html>

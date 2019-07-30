@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数值的扩展</title>
+</head>
+<body>
+
+</body>
+<script>
+    console.log("==================函数参数的默认值==================")
+    function log(x, y = 'Word'){
+        console.log(x + y);
+        //参数变量是默认声明的所有不能再用let或const再次声明
+        // let x = 1;不管有没有默认值都不行
+        // const y = 2;
+    }
+    log("Hello")
+    log("Hello", "China")
+    log("Hello", "")
+
+    // 不报错
+    function foo1(x, x, y) {
+        // ...
+    }
+
+    // 报错，使用默认值，变量名不能重复，一般没人这么用
+    // function foo2(x, x, y = 1) {
+    //     // ...
+    // }
+
+    //参数默认值是惰性求值的，举个例子
+    let lx = 99;
+    function foo(x = lx + 1){
+        console.log(x);
+    }
+    foo();
+    lx = 200;
+    foo()
+
+    //与结构默认值一起使用
+    function jgFun({x, y = 5}){
+        console.log(x, y);
+    }
+
+    jgFun({});
+    jgFun({x: 1});
+    jgFun({x: 1});
+    jgFun({x: 1, y: 2});
+    // jgFun();由于x没有给默认值，报错
+
+    //项目中常用的例子
+    function fetch(url, {body= '', method= 'GET',headers = {}} = {}){
+        console.log(method);
+    }
+
+    fetch("test.com")
+    fetch("test.com", {method: 'fetch'})
+
+    //两个默认值写法，经常看，经常练习, 默认参数一般使用在尾参数
+    function m1({x = 0, y = 0} = {}){
+        console.log(x, y)
+    }
+    function m2({x, y} = {x: 0, y: 0}){
+        console.log(x, y)
+    }
+
+    m1({})
+    m2({})
+
+    //函数的length属性
+    console.log((function(a){}).length);
+    console.log((function(a = 1){}).length);
+    console.log((function(a, b, c = 1){}).length);
+
+    //不固定参数length就是0
+    (function(...args) {}).length // 0
+
+    //设置了默认值的参数不是位数length也不计算后面的参数了
+    (function (a = 0, b, c) {}).length // 0
+    (function (a, b = 1, c) {}).length // 1
+
+    console.log("==================函数参数的默认值==================")
+    console.log("==================函数参数的默认值==================")
+    console.log("==================函数参数的默认值==================")
+    console.log("==================函数参数的默认值==================")
+    console.log("==================函数参数的默认值==================")
+
+</script>
+</html>

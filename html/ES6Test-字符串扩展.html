@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<mate charset="UTF-8">
+	<title>学习ES6的字符串扩展</title>
+</head>
+<body>
+</body>
+<script>
+	console.log("==============unicode使用的少，暂时先跳过===================")
+	
+	console.log("==============字符串的遍历器接口===================")
+	for(let codePoint of "foo"){
+		console.log(codePoint);
+	}
+	
+	//遍历器的最大优点是，之前传统的for循环是不能识别0xffff之外的码点的，但是用新的遍历方法就可以
+	let text = String.fromCodePoint(0x20BB7);
+	for(let i=0;i<text.length;i++){
+		console.log(text[i]);
+	}
+	for(let i of text){
+		console.log(i);
+	}
+	
+	console.log("==============字符串直接输入unicode，行分隔和段分隔===================")
+	const json = '"\u2028"';//行分隔符
+	console.log(JSON.parse(json));
+	
+	console.log("==============JSON.stringify() 的改造===================")
+	console.log(JSON.stringify('\u{007A}'));
+	console.log(JSON.stringify('\u{D834}'));//转义不了的之前会报错，现在直接返回不能转义的字符串
+	
+	console.log("==============模板字符串===================")
+	console.log(`string test line 1
+	string text line 2`);
+	
+	let x = 1;
+	let y = 2;
+	console.log(`${x} + ${y} = ${x + y}`);
+	
+	let obj = {x: 1, y: 2};
+	console.log(`${obj.x + obj.y}`);
+	
+	function f(){
+		return "Hello Word";
+	}
+	console.log(`foo ${f()} bar` );
+	
+	let z = `${x} + 3`;
+	console.log(z);
+	
+	let func = (name) => `Hello ${name}`;
+	let str = 'word';
+	console.log(func(`my ${str}`));
+	
+	console.log("==============模板编译===================")
+	let data = {
+		supplies: ['test1','test2']
+	}
+	let template = `
+		<ul>
+		  <% for(let i=0; i < data.supplies.length; i++) { %>
+			<li><%= data.supplies[i] %></li>
+		  <% } %>
+		</ul>
+	`;
+
+	console.log(template);//我这里不知道为啥不好使呢
+	
+	
+	console.log("==============标签模板===================")
+	let a = 5;
+	let b = 10;
+	
+	function tag(s, v1, v2){
+		console.log(s[0]);
+		console.log(s[1]);
+		console.log(s[2]);
+		console.log(v1);
+		console.log(v2);
+	}
+	
+	tag`hello ${a + b} word ${a * b} !`; //输出：
+	// "Hello "
+	// " world "
+	// "!"
+	// 15
+	// 50
+	
+	
+</script>
+</html>
