@@ -147,8 +147,89 @@
         }
     }())
 
-    console.log("==================函数参数的默认值==================")
-    console.log("==================函数参数的默认值==================")
+    console.log("==================name属性==================")
+    function testName(){};
+    console.log(testName.name);
+
+    var testName1 = function (){}
+    console.log(testName1.name);//es5返回“”，es6返回testName1
+
+    const testName2 = function baz(){};
+    console.log(testName2.name);//baz
+
+    (new Function).name // "anonymous" function构造函数返回anoymous
+
+    function foo() {};
+    console.log(foo.bind({}).name); // "bound foo" bind 返回的函数，name属性前加上bound前缀
+
+    console.log((function(){}).bind({}).name); // "bound "
+
+    console.log("==================箭头函数，重中之重==================")
+    //如果箭头函数代码块对于一条语句就要用大括号将他们括起来
+    var logAndSum  = (num1, num2) => {
+        console.log(num1 + num2);
+        return num1 + num2;
+    }
+
+    //由于使用大括号解释为代码块，所以箭头函数如果要返回一个对象，必须在对象外面加上“（）”
+    //let getTempItem = id => {id: id, name: "temp"};//Uncaught SyntaxError: Unexpected token : 意外的标记
+    let getTempItem = id => ({id: id, name: "temp"});
+
+    //如果箭头函数只有一行语句，且不需要返回值，可以采用下面的写法，不用写大括号了
+    let nFun = () => void doesNotReturn();
+
+    //箭头函数和变量结构结合使用
+    let full = ({firstName, lastName}) => {return firstName + "_" + lastName}
+    console.log(full({firstName: "Hello", lastName: "Word"}));
+
+    //箭头函数和rest参数的联用
+    const numbers = (...nums) => nums;
+    console.log(numbers(1,2,3,4,5))//将一串数字转成数组
+    const headAndTail = (head, ...tails) => [head, tails];
+    console.log(headAndTail('a','b','c','d','e'));
+
+    //函数体内的this对象，就是定义是所在的对象，而不是使用时所在的对象
+    function fooThis(){
+        setTimeout(() => {
+            console.log(this.id);
+        },100);
+    }
+    var id = 23;
+    fooThis.call({id: 22});//结果时22
+
+    //下面有个烧脑的例子
+    function Timer(){
+        this.s1 = 0;
+        this.s2 = 0;
+        //箭头函数，这里的this指向的是timer中的s1
+        setInterval(() => this.s1++ , 1000);
+        //普通函数,这里的this指向的是全局的s2
+        setInterval(function(){
+            this.s2++;
+        },1000)
+    }
+
+    var timer = new Timer();
+
+    setTimeout(() => console.log(timer.s1),3100);//3
+    setTimeout(() => console.log(timer.s2),3100);//0
+    setTimeout(function(){console.log(timer.s1)},3100);//3和是否箭头调用没有关系
+    setTimeout(function(){console.log(timer.s2)},3100);//0
+
+    //又一个有些烧脑的方法, 下面的id都是1，因为箭头函数没有this,这里的this都是showIdFoo方法内部的
+    function showIdFoo(){
+        return () => {
+            return () => {
+                return () => {
+                    console.log(this.id);
+                };
+            };
+        };
+    }
+    var showIdF = showIdFoo.call({id: 1});
+    var t1 = showIdF.call({id: 2})()();
+    var t2 = showIdF().call({id: 3})();
+    var t3 = showIdF()().call({id: 4});
 
 </script>
 </html>
