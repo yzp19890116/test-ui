@@ -5,7 +5,7 @@
     <title>数值的扩展</title>
 </head>
 <body>
-
+    <button id="press">按钮</button>
 </body>
 <script>
     console.log("==================函数参数的默认值==================")
@@ -231,5 +231,115 @@
     var t2 = showIdF().call({id: 3})();
     var t3 = showIdF()().call({id: 4});
 
+    //除了this,还有arguments, super, new.target 也是不存在的，此处例子引出call和bind方法不够熟悉，有时间多熟悉
+    function showArguments(){
+        setTimeout(() => {
+            console.log(arguments)//箭头函数没有arguments这里的指向showArguments方法的arguments
+        })
+    }
+    showArguments(1,2,3,4,5)
+
+
+    console.log("==================箭头函数不适用的场景==================")
+    //定义对象的方法,  对象不生成单独的作用于，用普通的方法，this指向cat内部，用箭头函数指向的确是全局
+    const cat = {
+        lives: 9,
+        jump: () => {
+            this.lives--
+        }
+    }
+    cat.jump();
+    console.log(cat.lives);
+
+    //需要动态this的时候不能用箭头函数
+    var button = document.getElementById("press")
+    // button.addEventListener('click', ()=>{
+    //     this.classList.toggle('on');
+    // })
+    button.addEventListener('click', function(){
+        this.classList.toggle('on');
+    })
+
+    //函数体如果很复杂不建议用箭头函数，是代码可读性更高
+
+    console.log("==================尾调用优化，方法调用方法会生成一个'调用栈（call stack）'，而为函数优化的话，外城函数调用帧就被取代了，大大节省内存==================")
+    console.log("==================尾调用调优，不能指不再使用父方法的变量和方法==================")
+    //举个错误例子，虽然尾调用没有用到，但是尾调用调用的方法用到了addOne方法中的one变量
+    function addOne(a){
+        var one = 1;
+        function inner(b) {
+            return b + one;
+        }
+        return inner(a);
+    }
+
+    console.log("==================尾递归优化==================")
+    function factorial(n){
+        if(n === 1) return 1;
+        return n * factorial(n-1);
+    }
+    //console.log(factorial(999));//复杂度 O(n)
+
+    function yhFactorial(n, total){
+        if(n === 1) return total;
+        return yhFactorial(n-1, n * total)
+    }
+    //console.log(yhFactorial(999,1));//复杂度 O(1)
+
+    function Fibonacci(n){
+        if(n <= 1){ return 1 }
+        return Fibonacci(n - 1) + Fibonacci(n - 2);
+    }
+    console.log(Fibonacci(10))
+    //console.log(Fibonacci(100))//内存溢出,一直转圈
+
+    function YhFibonacci(n, ac1=1, ac2=1){
+        if(n <= 1){ return ac2 }
+        return YhFibonacci(n-1, ac2, ac1 + ac2)
+    }
+    console.log(YhFibonacci(10))
+    console.log(YhFibonacci(100))//可以出输出值
+
+    console.log("==================三种方式优化尾调用==================")
+    //增加一个中间层，把易懂暴露出去，把逻辑层提出
+    function tailFactorial(n, total){
+        if(n <= 1){ return total}
+        return tailFactorial(n - 1, n * total)
+    }
+
+    function showFactorial(n){
+        tailFactorial(n, 1);
+    }
+
+    //柯里化（currying）
+    function currying(fn, n){
+        return function(m){
+            return fn.call(this, m, n)
+        }
+    }
+
+    function curryingTailFactorial(n, total){
+        if(n <= 1){ return total}
+        return curryingTailFactorial(n - 1, n * total)
+    }
+
+    const curryingFactorial = currying(curryingTailFactorial, 1);
+    console.log(curryingFactorial(100));
+
+    //最简单的方法，默认值。。。
+    function defaultFactorial(n, total = 1) {
+        if (n === 1) return total;
+        return factorial(n - 1, n * total);
+    }
+
+    //ES6 的尾调用优化只在严格模式下开启，正常模式是无效的。这是因为在正常模式下，函数内部有两个变量，可以跟踪函数的调用栈。
+    //尾调用优化发生时，函数的调用栈会改写，因此上面两个变量就会失真。严格模式禁用这两个变量，所以尾调用模式仅在严格模式下生效。
+    function restricted() {
+        'use strict';
+        //restricted.caller;    // 报错
+        //restricted.arguments; // 报错
+    }
+    restricted();
 </script>
+
 </html>
