@@ -74,15 +74,79 @@
     console.log((function(a, b, c = 1){}).length);
 
     //不固定参数length就是0
-    (function(...args) {}).length // 0
+    (function(...args) {}).length; // 0
 
     //设置了默认值的参数不是位数length也不计算后面的参数了
-    (function (a = 0, b, c) {}).length // 0
-    (function (a, b = 1, c) {}).length // 1
+    (function (a = 0, b, c) {}).length; // 0
+    (function (a, b = 1, c) {}).length; // 1
 
-    console.log("==================函数参数的默认值==================")
-    console.log("==================函数参数的默认值==================")
-    console.log("==================函数参数的默认值==================")
+    console.log("==================作用域：设置了参数的默认值，函数进行声明初始化时，参数会行程一个单独的作用域==================")
+    var zyyX = 1;
+    function zyyF(zyyX, y = zyyX){
+        console.log(y);
+    }
+    zyyF(2);//2
+
+    let zyyX1 = 1;
+    function zyyF1(y = zyyX1){
+        let zyyX1 = 2;//参数y = zyyX1时行程一个单独的作用域，这个作用域中zyyX1还没声明就用全局的zyyX1
+        console.log(y);
+    }
+    zyyF1();//1
+    zyyF1(3);//3
+
+    var zyyX2 = 1;
+    function zyyF2(zyyX2, y = function(){ zyyX2 = 2}){
+        // var zyyX2 = 3;
+        zyyX2 = 3;
+        y();
+        console.log(zyyX2);//有var 值为1， 没有var值为2，因为没有var 方法中的zyyX2指向的就是第一个参数zyyX2，和y匿名函数中内部的zyyX2是一致的，而不是自定义作用域
+    }
+    zyyF2();
+
+    //应用: 利用默认值可以指定某个参数是不能省略的
+    function throwIfMissing(){
+        throw new Error("Missing parameter");
+    }
+    function yyF(mustProvided = throwIfMissing()){
+        return mustProvided;
+    }
+    //yyF();//此处如果必要参数没有传，就会抛出预设的异常
+
+
+    console.log("==================rest参数==================")
+    function add(...values){
+        let sum = 0;
+        values.forEach(function(item){
+            sum += item;
+        })
+        console.log(sum);
+    }
+    add(1, 2, 3, 4);
+
+    const sortNumbers = (...numbs) => numbs.sort();
+    console.log(sortNumbers(2,5,6,3,4));
+
+    function pushArr(array, ...items){
+        items.forEach(function(item){
+            array.push(item);
+            console.log(item);
+        })
+        return array;
+    }
+    var arr = [];
+    console.log(pushArr(arr, 1,3,5,6,2,3));
+
+    console.log("==================严格模式：'use strict': es2016开始规定了使用了默认值、结构赋值、或者扩展运算，内部是不能显示定义严格模式的==================")
+    //函数内部的严格模式，同时适用于函数体和函数参数。但是，函数执行的时候，先执行函数参数，然后再执行函数体。这样就有一个不合理的地方，只有从函数体之中，才能知道参数是否应该以严格模式执行，但是参数却应该先于函数体执行。
+    //两个办法可以解决，1、定义全局的严格模式；2、吧函数抱在一个五参数的立即执行函数里
+    const doSomeThing = (function(){
+        'use strict';
+        return function(value = 1){
+            return value;
+        }
+    }())
+
     console.log("==================函数参数的默认值==================")
     console.log("==================函数参数的默认值==================")
 
