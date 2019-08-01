@@ -340,6 +340,81 @@
         //restricted.arguments; // 报错
     }
     restricted();
+
+    console.log("==================尾递归优化的实现==================")
+    //下面这是一个正常的递归
+    function sum(x, y){
+        if(y > 0){
+            return sum(x+1, y-1);
+        }else {
+            return x;
+        }
+    }
+
+    sum(1,100);
+
+    //使用蹦床函数
+    function trampoline(f){
+        while(f && f instanceof Function){
+            f = f();
+        }
+        return f;
+    }
+
+    function tSum(x, y){
+        if(y > 0){
+            return tSum.bind(null, x + 1, y - 1);
+        }else{
+            return x;
+        }
+    }
+    console.log(trampoline(sum(1,100)));//使用本创函数执行sum就不会发生调用栈溢出
+
+    //这个是作者吹嘘的真正的解决了尾递归优化的方法实现,急需恶补一下call、apply等方法
+    function tco(f){
+        var value;
+        var active = false;
+        var accumulated = [];
+
+        return function accumulator(){
+            accumulated.push(arguments);
+            if(!active){
+                active = true;
+                while (accumulated.length) {
+                    value = f.apply(this, accumulated.shift());
+                }
+                active = false;
+                return value;
+            }
+        }
+    }
+
+    var acc = tco(function(x, y){
+        if(y > 0) {
+            return sum(x + 1, y - 1)
+        }else{
+            return x;
+        }
+    });
+
+    console.log(acc(1, 100));
+
+    console.log("==================函数参数的尾逗号：ES6（2017）中比较人性关怀的改动，函数定义和调用是允许加“,”的，虽然允许了，但是不要随便用啊==================")
+
+    console.log("==================Function.prototype.toString()==================")
+    //简单描述一下就是ES2019之后function的toString方法吧注释信息都返回了
+    function /* test */ shouBz(){};
+    console.log(shouBz.toString());
+
+    console.log("==================catch 命令的参数省略==================")
+    //又是ES2019的人性关怀try/catch模块catch可以省略参数，还是那句话，虽然可以，但是不要随便用
+    try{
+
+    }catch {//新浏览器这样写也不报错
+
+    }
+
+
 </script>
 
 </html>
