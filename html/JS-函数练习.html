@@ -11,7 +11,6 @@
     function findMax(){
         let max = -Infinity;
         for(let i=0;i<arguments.length;i++){
-            console.log(arguments[i]);
             if(arguments[i] > max){
                 max = arguments[i];
             }
@@ -20,5 +19,78 @@
     }
 
     console.log(findMax(1,2,3));
+
+    var test = 1;
+    function changeValue(val){
+        //函数中调用的参数是函数的参数，javaScrip中通过值传递：函数只知道值，不知道参数的位置，如果函数改变了参数的值，它不会改变参数原来的值
+        val++;
+        console.log(val);//2
+    }
+    changeValue(test);
+    console.log(test);//1
+
+    var obj = {a: 1 ,b: 2};
+    function changeObj(obj){
+        //对象的行为：通过引用来传递，如果函数改变了对象属性，他也改变了原始值
+        obj.a = 3;
+        console.log(obj);
+    }
+    changeObj(obj);
+    console.log(obj);
+
+    //作为方法调用函数
+    var myObject = {
+        firstName: "hello",
+        lastName: "word",
+        fullName: function(){
+            return this.firstName + this.lastName;
+        }
+    }
+    console.log(myObject.fullName());
+
+    //通过函数构造器调用函数，对比一下
+    function myFun(){
+        this.firstName = "test";
+    }
+    var x = myFun();
+    var y = new myFun();
+    //console.log(x.firstName);//这里this指的是window，没有firstName属性
+    console.log(y.firstName);//这里this指的就是myFun
+
+    console.log("===============JavaScript call() 方法====================")
+    var person = {
+        firstName: "p",
+        lastName: "per",
+        fullName: function (city, country) {
+            console.log(this.firstName + "_" + this.lastName + ";city："+ city + ";country："+ country);
+        }
+    }
+
+    var person1 = {
+        firstName: "a",
+        lastName: "a1"
+    }
+
+    var person2 = {
+        firstName: "b",
+        lastName: "b2"
+    }
+
+    person.fullName.call(person, "d", "l");
+    person.fullName.call(person1);
+    person.fullName.call(person2);
+
+    //apply使用,w3cschool上初步介绍了apply和call的用法，区别在于call是逐个接受参数，而apply接受的是一个数组，有待进一步的学习这两个方法
+    person.fullName.apply(person, ["app", "ly"])
+
+    //闭包的一个使用实例，做计数器
+    var add = (function(){
+        var counter = 0;
+        return function(){ return counter+=1;}
+    })();
+
+    add();
+    add();
+    console.log(add());
 </script>
 </html>
