@@ -149,11 +149,186 @@
     //另外ES6规定，Class的原型的方法都是不可枚举的
     console.log(Object.getOwnPropertyDescriptor(class{foo(){}}.prototype, 'foo').enumerable);
 
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
+    console.log("==================super 关键字==================")
+    //ES6新增了关键字super，指向当前对象的原型对象
+    const proto = {
+        foo: 'hello'
+    }
+    const sObj = {
+        foo: 'world',
+        find(){
+            return super.foo;
+        }
+    };
+
+    console.log(sObj.find());
+    Object.setPrototypeOf(sObj, proto);//设置一个指定的对象的原型（即内部的【Prototype】属性）到另一个对象，这里我理解为指定sObj的原型到外部的proto对象
+    console.log(sObj.find());
+
+    //注意：super关键字表示原型对象时，只能用在对象的方法之中，用在其他地方会报错(看下面的例子，还得是简写的方法)
+    // const errObj = {
+    //     //错误原因是super用在属性中
+    //     foo: super.foo
+    // }
+
+    // const errObj1 = {
+    //     //目前只有对象方法的简写，可以让JavaScript引擎确认，定义的是对象的方法
+    //     foo: () => super.foo
+    // }
+
+    // const errObj2 = {
+    //     //目前只有对象方法的简写，可以让JavaScript引擎确认，定义的是对象的方法
+    //     foo: function(){
+    //         return super.foo;
+    //     }
+    // }
+
+    //JavaScript引擎内部，super.foo等同于Object.getPrototypeof(this).foo或Object.getPrototypeOf.foo.call(this)
+    const proto11 = {
+        x: 'hello',
+        foo(){
+            console.log(this.x);
+        }
+    }
+
+    const pObj = {
+        x: 'word',
+        foo(){
+            super.foo();
+        }
+    }
+
+    proto11.foo();//hello
+    Object.setPrototypeOf(pObj, proto11);
+    pObj.foo()//word,spuer.foo指向原型对象protol1的foo方法，但是this还是指向当前对象，所以输出word
+
+
+    console.log("==================解构赋值==================")
+    let {x, y, ...z} = {x:1, y:2, a:3, b: 4}
+    console.log(x)
+    console.log(y)
+    console.log(z)//{a: 3, b: 4}
+
+    //解构赋值要去等号右边是一个对象，所以如果等号右边是undefined或者是null就会报错
+    //let {...zn} = null;//Uncaught TypeError: Cannot destructure 'undefined' or 'null'
+
+    //解构函数必须是最后一个参数
+    //let{...sx, y} = {};//Uncaught SyntaxError: Rest element must be last element
+
+    //解构赋值的拷贝是浅拷贝，如果一个键的值是复合类型的值，那么解构赋值拷贝的是这个值的引用
+    let jObj = {a: {b: 2}};
+    let {...jx} = jObj;
+    jObj.a.b = 3;
+    console.log(jx);
+
+    //扩展运算符的解构赋值，不能复制继承自原型对象的属性
+    let co1 = {a: 1};
+    let co2 = {b: 2};
+    co2.__proto__ = co1;//对象有__proto__属性，函数有prototype属性
+    let {...co3} = co2;
+    console.log(co2);
+    console.log(co3);
+
+    //下面有个烧脑的例子,
+    const teo = Object.create({v1:1, v2:2});
+    teo.v3 = 3;
+    let{v1, ...v4} = teo;
+    let{v2, v3} = v4;
+    console.log(teo);//此处把teo打出来就能立刻明白，使用Object.create创建的是__proto__属性，所以解构赋值是不能解析的
+    console.log(v2);//undefined
+    console.log(v3);//3
+    console.log(v4);//{v3: 3}
+
+    //下面有个实用的例子
+    function baseFunction({a,b}){
+        //此处参数是一个有a和b的对象，也可以是任何想要做操作的对象类型
+    }
+    function wrapperFunction({x,y, ...restConfig}){
+        //原方法，设置两个固定的参数，剩下是扩展函数，
+        //在wrapper方法中对x,y进行一个操作
+        return baseFunction(restConfig);
+    }
+
+    console.log("==================扩展运算符==================")
+    //对象的扩展运算符（...）用于去除参数对象的所有可遍历属性，拷贝到当前对象之中
+    let kz = {a:1, b:2};
+    let kn = {...z};
+    console.log(kn);//{a:1, b:2}
+
+    //对象的扩展运算符用于数组
+    let kfoo = {...['a','b','c']}
+    console.log(kfoo);//{0:a, 1:b, 2:c}
+
+    //如果扩展运算符后面是一个空对象，没有任何效果
+    console.log({...{}, a:1});//{a:1}
+
+    //如果扩展运算符后面不是对象，会自动将其转为对象
+    console.log({...1});//{}这个写法等同于等同于 {...Object(1)}
+    console.log({...true});//同上
+    console.log({...null});//同上
+    console.log({...undefined});//同上
+    console.log({...''});
+    console.log({...'hello'});//如果是字符串则会自动转成类似数组{0: "h", 1: "e", 2: "l", 3: "l", 4: "o"}
+    console.log({...'h'});//{0: "h"}
+
+    //对象的扩展运算符等同于使用Object.assgin()方法，只是拷贝了对象的实例属性
+    //let aClone = {...a};//等同于let aClone = Object.assign({}, a);
+
+    //三个写法可以完全克隆一个对象,推荐使用二和三方法，方法一在非浏览器环境下不一定部署
+    const clone1 = {
+        __proto__: Object.getPrototypeOf(obj),
+        ...obj
+    }
+    const clone2 = Object.assign(
+        Object.create(Object.getPrototypeOf(obj)),
+        obj
+    );
+    const clone3 = Object.create(
+        Object.getPrototypeOf(obj),
+        Object.getOwnPropertyDescriptor(obj)
+    )
+
+    //扩展运算符可以用于合并两个对象
+    let ab = {...{a:1}, ...{b:2}};//等同于let ab = Object.assign({}, {a:1}, {b:2}});
+
+    //如果用户自定义的属性放在扩展运算符的后面，则扩展运算符内部的同名属性会被覆盖，如果用Object.assign思考就很好理解了
+    let kx = 1, ky = 2;
+    var ka = {kx: 3, kz: 4};
+    let kk = {...ka, kx, ky};
+    console.log(kk);//{kx: 1, kz: 4, ky: 2}这里kx就被覆盖成了1
+    //用覆盖的这个属性来修改对象中的部分属性就很方便
+    let kk1 = {
+        ...kk,
+        kz: 6
+    }
+    console.log(kk1);//{kx: 1, kz: 6, ky: 2}很简单就把kz给修改成了新值
+    console.log(kk);//{kx: 1, kz: 4, ky: 2}由于是新定义变量后修改，原值没有变化
+
+    //与数组一样，扩展运算符可以是表达式
+    x = 2;
+    const bObj = {
+        ...(x > 1 ? {a: 1} : {}),
+        b : 2
+    }
+    console.log(bObj);
+
+    //扩展运算符的参数对象中，如果有取值函数get这个函数是会执行的
+    let aWithXGetter = {
+        ...bObj,
+        get x(){
+            throw new Error('show an error');//这个没有输出
+        }
+    }
+
+    let bWithXGetter = {
+        ...bObj,
+        ...{
+            get x(){
+                throw new Error("show an other error")//这里输出异常了
+            }
+        }
+    }
+
 </script>
 
 </html>
