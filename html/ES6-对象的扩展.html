@@ -285,7 +285,7 @@
     );
     const clone3 = Object.create(
         Object.getPrototypeOf(obj),
-        Object.getOwnPropertyDescriptor(obj)
+        Object.getOwnPropertyDescriptors(obj)
     )
 
     //扩展运算符可以用于合并两个对象

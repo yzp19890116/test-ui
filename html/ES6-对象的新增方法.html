@@ -91,9 +91,162 @@
     }
 
     console.log("==================Object.getOwnPropertyDescriptors()==================")
+    const obj = {
+        foo: 123,
+        get bar(){
+            return 'abc'
+        }
+    }
+    console.log(Object.getOwnPropertyDescriptors(obj));
+
+    //该方法的引入，很大程度的解决了assign不能正确copy，get和set属性的问题
+    const cSource = {
+        set foo(value){
+            console.log(value);
+        }
+    }
+    const cTarget = {};
+    Object.assign(cTarget, cSource);
+    console.log(Object.getOwnPropertyDescriptor(cTarget, 'foo'));
+    Object.defineProperties(cTarget, Object.getOwnPropertyDescriptors(cSource));//用getOwnPropertyDescriptors拷贝
+    console.log(Object.getOwnPropertyDescriptor(cTarget, 'foo'));
+
+    //两个对象合并的逻辑可以写成一个函数
+    const shallowMerge = (target, soutce) => Object.defineProperties(
+        target,
+        Object.getOwnPropertyDescriptors(source)
+    )
+
+    //配合Object.create(),可以做对象的克隆，参考对象扩展中278行，三个克隆对比
+    const clone1 = (obj) => Object.create(
+        Object.getPrototypeOf(obj),
+        Object.getOwnPropertyDescriptors(obj),
+    )
+
+    //使用getOwnPropertyDescriptors也可以实现继承
+    const sunObj = {
+        __proto__: source,
+        foo: 123
+    }
+    //ES6 规定__proto__只有浏览器要部署，其他环境不用部署。如果去除__proto__，上面代码就要改成下面这样。
+    const sunObj1 = Object.create(source);
+    sunObj1.foo = 123;
+    const subObj2 = Object.assign(Object.create(source),{foo1: 123});
+
+    const subObj3 = Object.create(
+        source,
+        Object.getOwnPropertyDescriptors({
+            foo1: 123
+        })
+    )
+    //使用getOwnPropertyDescriptors也可以做混入
+    let mix = (object) => ({
+        with: (...mixins) => mixins.reduce(
+            (c, mixin) => Object.create(
+                c, Object.getOwnPropertyDescriptors(mixin)
+            ), object)
+    });
+
+    let mininFub = function(obj){
+        return {
+            within: function(...mixins){
+                return  mixins.reduce(function(total, mixin){
+                    return Object.create(
+                        total,
+                        Object.getOwnPropertyDescriptors(mixin)
+                    )
+                }, obj)
+            }
+        }
+    };
+
+    let a = {a: 'a'};
+    let b = {b: 'b'};
+    let c = {c: 'c'};
+    console.log(Object.create({a: 'a'}, Object.getOwnPropertyDescriptors(c)));//{c: "c"}，我理解是{a: "a", c: "c"},但是__proto__里还是有的
+    let d = mix(c).with(a, b);
+
+    console.log(mininFub(c));
+    console.log(d);
+
+    console.log("==================__proto__属性，Object.setPrototypeOf()，Object.getPrototypeOf() ==================")
+    //不推荐使用__proto__属性，用setPrototypeOf和getPrototypeOf代替
+    //setPrototypeOf用法
+    console.log(Object.setPrototypeOf({}, null));//{}啥事都没干
+    //方法等同于
+    function setPrototypeOf(obj, proto){
+        obj.__proto__ = proto
+        return obj
+    }
+
+    const sObj = {x: 1};
+    const proto = {};
+    Object.setPrototypeOf(sObj, proto)
+    proto.y = 2;
+    proto.z = 3;
+    console.log(sObj);//这时__proto__里有y,z
+    Object.setPrototypeOf(sObj, {y: 4})
+    console.log(sObj);//这时__proto__里只有y
+    //由于undefined 和 null 不能转为对象所以下面报错
+    // Object.setPrototypeOf(undefined, {});
+    // Object.setPrototypeOf(null, {});
+
+    //getPrototypeOf用法
+    function Rectangle(){
+
+    }
+
+    const rec = new Rectangle();
+    console.log(Object.getPrototypeOf(rec) === Rectangle.prototype);//true
+    Object.setPrototypeOf(rec, Object.getPrototypeOf);
+    console.log(Object.getPrototypeOf(rec) === Rectangle.prototype);//false
+    //由于undefined 和 null 不能转为对象所以下面报错
+    // Object.getPrototypeOf(null);
+    // Object.getPrototypeOf(undefined);
+
+    console.log("==================Object.keys()，Object.values()，Object.entries() ==================")
+    let{keys, values, entries} = Object
+    let fObj = {a:1 , b:2, c:3}
+
+    for(let key of keys(fObj)){
+        console.log(key);
+    }
+    for(let val of values(fObj)){
+        console.log(val);
+    }
+    for(let enter of entries(fObj)){
+        console.log(enter);
+    }
+
+    //Object.values()用法
+    const vObj = {100: 'a', 2: 'b', 7: 'c' }
+    console.log(Object.values(vObj));//排序跟属性的遍历一致
+    const vObj1 = Object.create({}, {p: {value: 42}});
+    console.log(vObj1);
+    console.log( Object.values(vObj1));//[],Object.values只返回对象自身的可遍历属性。
+    const vObj2 = Object.create({}, {p: {value: 41, enumerable: true}});
+    console.log(Object.values(vObj2));//[41]，enumerable属性是true就能获取到
+    console.log(Object.values({ [Symbol()]: 123, foo: 'abc' }));//Object.values会过滤属性名为 Symbol 值的属性。
+    console.log(Object.values('foo'));//(3) ["f", "o", "o"]//字符串values当做数组
+    console.log(Object.values(44))//[]
+    console.log(Object.values(true))//[]
+    //Object.entries()用法除了值不一样，效果和用法都一样
+
+    //Object.fromEntries()是Object.entries()的逆操作
+    console.log(Object.fromEntries([['foo','bar'],['baz','222']]));//{foo: "bar", baz: "222"}
+
+    const map = new Map([
+        ['foo','bar'],
+        ['baz','222'],
+    ])
+    console.log(Object.fromEntries(map));
+    map.set('a',123);
+    console.log(Object.fromEntries(map));
+
+    //配合URLSearchParams对象，将查询字符串转为对象
+    console.log(Object.fromEntries(new URLSearchParams('http://baidu.com?test=1&foo=bar&baz=qux')));//这个获取参数可以参考一下项目中的做法
 
 
-    console.log("==================扩展运算符:它好比rest参数的你运算==================")
 </script>
 
 </html>
