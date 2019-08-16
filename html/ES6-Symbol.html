@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript的第七种数据类型Symbol</title>
+</head>
+<body>
+</body>
+<script>
+    console.log("==================概述和使用方法:凡是属性名属于Symbol类型，都是独一无二的，可以保证不会与其他属性名产生冲突==================")
+    let s = Symbol();//Symbol值通过Symbol函数生成，注意前面是没有new的
+    console.log(typeof s);
+
+    let s1 = Symbol('foo');//Symbol函数可以接受一个字符串参数，表示对Symbol实例的描述，主要为了在控制台展示
+    let s2 = Symbol('bar');
+    console.log(s1);
+    console.log(s2);
+
+    const obj = {
+        toString(){
+            return 'abc'
+        }
+    }
+    let s3 = Symbol(obj);
+    console.log(s3);//Symbol(abc),如果参数是一个对象，则调用对象的toString方法，将其转为字符串，然后生成Symbol值
+
+    let s11 = Symbol();
+    let s12 = Symbol();
+    console.log(s11 === s12);//false,凡是Symbol类型的都是独一无二的
+    let s13 = Symbol('1')
+    let s14 = Symbol('test')
+    console.log(s13 === s14);//加参数的也一样
+    console.log(s13 == s14);//双等号返回的也是false
+
+    //"test " + s11;//Uncaught TypeError: Cannot convert a Symbol value to a string, Symbol值不能与其他类型的值进行计算
+    // `test ${s11}`
+    console.log(String(s13));//可以用两种方法转换成string类型
+    console.log(s13.toString());
+
+    console.log(Boolean(s13));//可以转换成boolean类型
+    console.log(!s13);
+
+    // Number(s13);//Uncaught TypeError: Cannot convert a Symbol value to a number,但是不能转成数值类型
+    // s13 + 1
+
+    console.log("==================Symbol.prototype.description：就是返回创建Symbol时的描述==================")
+    console.log(s14.description);//test，区别于toSting方法返回的Symbol(test)
+
+
+    console.log("==================作为属性名的 Symbol ==================")
+    let mySymbol = Symbol();
+
+    //第一种写法
+    let a = {};
+    a[mySymbol] = 'Hello';
+
+    //第二种写法
+    let b = {
+        [mySymbol]: 'hello'//对象内部使用Symbol值定义属性时，Symbol值必须放在方括号之中
+    }
+
+    //第三种写法
+    let c = {};
+    Object.defineProperty(c, mySymbol, {value: 'hello'});
+
+    console.log(a[mySymbol]);//三个结果都是一样的
+    console.log(b[mySymbol]);
+    console.log(c[mySymbol]);
+
+
+
+
+    console.log("==================概述和使用方法:凡是属性名属于Symbol类型，都是独一无二的，可以保证不会与其他属性名产生冲突==================")
+
+</script>
+
+</html>
