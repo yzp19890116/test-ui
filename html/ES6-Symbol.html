@@ -67,10 +67,68 @@
     console.log(b[mySymbol]);
     console.log(c[mySymbol]);
 
+    console.log("==================消除魔法数字==================")
+
+    //普通的写法，这里"Triangle"就是魔法数字
+    function getArea(shape, options){
+        let area = 0;
+        switch(shape){
+            // case 'Triangle':
+            case shapeType.triangle: //这个改成从变量中取值
+                area = .5 * options.width * options.height;
+                break;
+        }
+        return area;
+    }
+
+    const shapeType = {
+        // triangle: 'triangle',
+        triangle: Symbol()//仔细分析发现其实后面这个是什么值都可以，使用Symbol的好处就是不会冲突，之后变量中的值判断，就不会出错
+    }
+
+    console.log("==================属性名遍历==================")
+    //Symbol作为属性名，该属性不会出现在for...in、for...of循环中，也不会被Object.keys()、Object.getOwnPropertyNames()、JSON.stringify()返回。但是，它也不是私有属性，有一个Object.getOwnPropertySymbols方法，可以获取指定对象的所有 Symbol 属性名。
+    const blObj = {};
+    let blA = Symbol('A');
+    let blB = Symbol('B');
+
+    blObj[blA] = 'hello';
+    blObj[blB] = 'word';
+    blObj["jth"] = '!';
+
+    const objectSymbols = Object.getOwnPropertySymbols(blObj);
+    console.log(objectSymbols);//0: Symbol(A);1: Symbol(B)
+    for(let i in blObj){
+        console.log(i);//["jth"]
+    }
+    console.log(Object.getOwnPropertyNames(blObj));//["jth"]
+
+    //新的API提供了一个新的方法Reflect.ownKeys(),能返回正常的变量和Symbol变量
+    console.log(Reflect.ownKeys(blObj));
 
 
+    console.log("==================Symbol.for()，Symbol.keyFor()==================")
 
-    console.log("==================概述和使用方法:凡是属性名属于Symbol类型，都是独一无二的，可以保证不会与其他属性名产生冲突==================")
+    let sf1 = Symbol('f1');
+    let sf2 = Symbol.for('f1');
+    let sf3 = Symbol.for('f1');
+    console.log(sf1 === sf2);//false
+    console.log(sf3 === sf2);//true
+
+    //Symbol.keyFor()返回的是一个已登记的Symbol类型值的key
+    console.log(Symbol.keyFor(sf1));//undefined
+    console.log(Symbol.keyFor(sf2));//f1
+    console.log(Symbol.keyFor(sf3));//f1
+
+    //需要注意的是，Symbol.for为 Symbol 值登记的名字，是全局环境的，可以在不同的 iframe 或 service worker 中取到同一个值。
+    let iframe = document.createElement("iframe");
+    iframe.src = String(window.location);
+    document.body.appendChild(iframe);
+
+    console.log(iframe.contentWindow.Symbol.for('foo') === Symbol.for('foo'));//true
+
+
+    console.log("==================实例：模块的 Singleton 模式==================")
 
 </script>
 
