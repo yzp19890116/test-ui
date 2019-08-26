@@ -7,6 +7,10 @@
 <body>
 </body>
 <script>
+    //引入单例的js
+    // const singleton = require('./js/singleton')
+
+
     console.log("==================概述和使用方法:凡是属性名属于Symbol类型，都是独一无二的，可以保证不会与其他属性名产生冲突==================")
     let s = Symbol();//Symbol值通过Symbol函数生成，注意前面是没有new的
     console.log(typeof s);
@@ -129,7 +133,228 @@
 
 
     console.log("==================实例：模块的 Singleton 模式==================")
+    // console.log(singleton.foo);
+    //深度学习一下require 和 import
 
+    console.log("==================内置的 Symbol 值==================")
+    //1、Symbol.hasInstance, 指向一个内部方法，当其他对象使用instanceof 运算符，判断是否为该对象的实例，会调用这个方法
+    console.log("Symbol.hasInstance");
+    class MyClass {
+        [Symbol.hasInstance](foo){
+            return foo instanceof Array;
+        }
+    }
+
+    console.log([1,2,3] instanceof new MyClass());//true，代码中，MyClass是一个类，new MyClass()会返回一个实例。该实例的Symbol.hasInstance方法，会在进行instanceof运算时自动调用，判断左侧的运算子是否为Array的实例。
+
+    class Even {
+        static [Symbol.hasInstance](obj){
+            return Number(obj) % 2 === 0
+        }
+    }
+    //等同于
+    const EvenConst = {
+        [Symbol.hasInstance](obj){
+            return Number(obj) % 2 === 0
+        }
+    }
+
+    console.log(1 instanceof Even);//false
+    console.log(2 instanceof Even);//true
+    console.log(12345 instanceof EvenConst);//false
+
+    //Symbol.isConcatSpreadable,属性等于一个布尔值，表示改对象用于Array.prototype.concat()时，是否可以展开
+    console.log("Symbol.isConcatSpreadable");
+
+    let arr1 = ['a','b'];
+    ['c','d'].concat(arr1, 'e');
+    console.log(arr1[Symbol.isConcatSpreadable]);//undefined,属性默认等于undefined, 数字的话undefined也展开
+
+    let arr2 = ['a','b'];
+    arr2[Symbol.isConcatSpreadable] = false;
+    console.log(['c','d'].concat(arr2, 'e')); ["c", "d", ['a','b'], "e"]
+
+    //类似数组的对象正好相反，默认不展开，设置为true才可以展开
+    let spObj = {length: 2, 0: 'c', 1: 'd'};
+    console.log(['a','b'].concat(spObj, 'e'));//["a", "b", {…}, "e"]
+    spObj[Symbol.isConcatSpreadable] = true;
+    console.log(['a','b'].concat(spObj, 'e'));//["a", "b", "c", "d", "e"]
+
+    //Symbol.isConcatSpreadable 也可以定义在类中
+    class A1 extends Array{
+        constructor(args){
+            super(args);
+            this[Symbol.isConcatSpreadable] = true;
+        }
+    }
+
+    class A2 extends Array{
+        constructor(args){
+            super(args);
+        }
+        get[Symbol.isConcatSpreadable](){
+            return false
+        }
+    }
+
+    let spA1 = new A1;
+    spA1[0] = 3;
+    spA1[1] = 4;
+
+    let spA2 = new A2;
+    spA2[0] = 5;
+    spA2[1] = 6;
+
+    console.log([1,2].concat(spA1).concat(spA2));//[1, 2, 3, 4, A2(2)]
+
+
+    //Symbol.species,指向一个构造函数，穿件衍生对象时，会使用该属性。总之，Symbol.species的作用在于，实例对象在运行过程中，需要再次调用自身的构造函数时，会调用该属性指定的构造函数。它主要的用途是，有些类库是在基类的基础上修改的，那么子类使用继承的方法时，作者可能希望返回基类的实例，而不是子类的实例。
+    console.log("Symbol.species");
+    class MyArray extends Array{
+        //
+        static get[Symbol.species]() { return Array }
+    }
+
+    const speA = new MyArray(1,2,3);
+    const speB = speA.map(x => x);
+    const speC = speA.fill(x => x > 1);
+
+    console.log(speB instanceof MyArray);//设置前：true；后：false(这个是重新生成的衍生对象)
+    console.log(speC instanceof MyArray);//设置前：true；后：true（这个是speA过滤出来的，所以还是MyArray的实例）
+
+    //Symbol.match等同于String.prototype.match(regexp)
+    console.log("Symbol.match");
+
+    class MyMatcher{
+        [Symbol.match](str){
+            return 'Hello Word'.indexOf(str)
+        }
+    }
+
+    console.log('l'.match(new MyMatcher()));//2，返回第一个匹配值
+
+    //Symbol.replace, 等同于String.prototype.replace(searchValue, replaceValue)
+    console.log("Symbol.replace");
+    const reX = {};
+    reX[Symbol.replace] = (...s) => console.log(s);//输出replace的searchValue和replaceValue
+
+    'Hello'.replace(reX, 'World');//["Hello", "World"]
+
+    //Symbol.search,String.prototype.search(regexp) 等同于 regexp[Symbol.search](this)
+    console.log("Symbol.search");
+    class MySearch{
+        constructor(value){
+            this.value = value;
+        }
+        [Symbol.search](str){
+            console.log(str.indexOf(this.value));
+        }
+    }
+    'foobar'.search(new MySearch('b'))
+
+    //Symbol.split, String.prototype.split(separator, limit) 等同于 separator[Symbol.split](this, limit)
+    console.log("Symbol.split");
+    class MySpliter{
+        constructor(value){
+            this.value = value;
+        }
+        [Symbol.split](str){
+            let strIndex = str.indexOf(this.value);
+            if(strIndex === -1){
+                return this.str
+            }
+            return [
+                str.substr(0, strIndex),
+                str.substr(strIndex + this.value.length)
+            ]
+        }
+    }
+
+    console.log('foobar'.split(new MySpliter('foo')));// ["", "foo"]
+    console.log('foobar'.split(new MySpliter('bar')));// ["foo", ""]
+    console.log('foobar'.split(new MySpliter('b')));// ["foo", "ar"]
+    console.log('foobar'.split(new MySpliter('o')));// ["f", "obar"],这个会用第一个匹配来截取
+
+    //Symbol.iterator，指向该对象的默认遍历器方法。//TO_STUDY function*和yield
+    console.log("Symbol.iterator");
+    const myIterator = {}
+    myIterator[Symbol.iterator] = function* (){
+        yield 1;
+        yield 2;
+        yield 3;
+    }
+
+    console.log([...myIterator]);
+
+    //Symbol.toPrimitive，指向一个方法。该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值。
+    //Symbol.toPrimitive被调用时，会接受一个字符串参数，表示当前运算的模式，一共有三种模式。
+    //Number：该场合需要转成数值
+    // String：该场合需要转成字符串
+    // Default：该场合可以转成数值，也可以转成字符串
+    console.log("Symbol.toPrimitive");
+    let priObj = {
+        [Symbol.toPrimitive](hint){
+            switch (hint) {
+                case 'number':
+                    return 123
+                case 'string':
+                    return 'str'
+                case 'default':
+                    return 'default'
+                default:
+                    throw new Error()
+            }
+        }
+    }
+
+    console.log(2 * priObj);//246
+    console.log(3 + priObj);//3default
+    console.log('default' == priObj);//true
+    console.log(String(priObj));//str
+
+
+    //Symbol.toStringTag,直接上例子.
+    console.log("Symbol.toStringTag");
+    console.log(({[Symbol.toStringTag]: 'test'}).toString());//[object test], 把定义的字符直接拼接在toString结果后面
+
+    class Collection {
+        get[Symbol.toStringTag](){
+            return 'testCollection'
+        }
+    }
+    let x = new Collection();
+    console.log(x.toString());//[object testCollection]
+
+    //Symbol.unscopables，指向一个对象。该对象指定了使用with关键字时，哪些属性会被with环境排除。
+    console.log("Symbol.unscopables");
+    console.log(Array.prototype[Symbol.unscopables]);
+    // {
+    //   copyWithin: true,
+    //   entries: true,
+    //   fill: true,
+    //   find: true,
+    //   findIndex: true,
+    //   includes: true,
+    //   keys: true
+    // }
+    //上面代码说明，数组有 7 个属性，会被with命令排除。
+
+    class MyClass1{
+        foo(){
+            return 1;
+        }
+        get[Symbol.unscopables](){
+            return {foo: true}
+        }
+    }
+
+    var foo = function(){
+        return 2
+    }
+
+    with(MyClass1.prototype){
+        console.log(foo());//没有unscopables时1，有unscopables时是2
+    }
 </script>
 
 </html>
