@@ -355,6 +355,148 @@
     with(MyClass1.prototype){
         console.log(foo());//没有unscopables时1，有unscopables时是2
     }
+
+    console.log("==================WeakSet：结构和Set类似，但WeakSet成员只能是对象.WeakSet中的对象都是弱引用，所以垃圾回收机制不考虑WeakSet对该对象的引用==================")
+    //WeakSet是一个构造函数，可以用new命令创建WeakSet数据接口
+    const ws = new WeakSet();
+
+    //注意WeakSet的成员只能是对象，使用wsa创建的时候wsa有两个数组成员（是对象），wsb有两个基础类型数据成员。是用数组中的成员穿件而不是本身，所以wsb报错
+    const wsa = [[1,2],[3,4]]
+    const ws1 = new WeakSet(wsa);
+    const wsb = [1,2]
+    // const ws2 = new WeakSet(wsb);//Uncaught TypeError: Invalid value used in weak set
+
+    /*
+        WeakSet 不可遍历，没有size属性
+        WeakSet 结构有以下三个方法。
+
+        WeakSet.prototype.add(value)：向 WeakSet 实例添加一个新成员。
+        WeakSet.prototype.delete(value)：清除 WeakSet 实例的指定成员。
+        WeakSet.prototype.has(value)：返回一个布尔值，表示某个值是否在 WeakSet 实例之中。
+    */
+
+    const wsdemo = new WeakSet();
+    const test1 = {};
+    const test2 = {};
+
+    wsdemo.add(test1);
+    wsdemo.add(window);
+
+    console.log(wsdemo.has(test1));
+    console.log(wsdemo.has(test2));
+    console.log(wsdemo.has(window));
+    wsdemo.delete(window)
+    console.log(wsdemo.has(window));
+
+    console.log("==================Map:理解起来就是增强版的Object，键值可以使用对象了==================")
+    const m = new Map();
+    const ob = {p: 'Hello World'};//key值可以是一个对象
+
+    //操作基本和Set相似，添加和获取市set和get
+    m.set(ob);
+    console.log(m.get(ob));
+    console.log(m.has(ob));
+    console.log(m.size);
+    m.delete(ob)
+    console.log(m.has(ob));
+    console.log(m.size);
+
+    //具有Iterator接口，并且每个成员都是一个双元素的数字数据结构，都能但是是Map构造函数的参数
+
+    const mSet = new Set([['foo',1],['bar',2]])
+    const m1 = new Map(mSet);
+    console.log(m1.get('foo'));
+
+    const m2 = new Map([['baz',3]]);
+    const m3 = new Map(m2);
+    console.log(m3.get('baz'));
+
+    m3.set('baz', 4);
+    console.log(m3.get('baz'));//4,多次赋值会对后来的值会覆盖前面的值
+    console.log(m3.get('baz1'));//获取位置的健返回undefined
+
+    //注意：Map的键实际绑定的是内存地址，只要内存地址不一样，就视为两个键
+    const objMap = new Map();
+    const k1 = ['a'];
+    const k2 = ['a'];
+
+    objMap.set(k1, 111).set(k2, 222);
+    console.log(objMap.get(k1));//111,虽然数组中内容一致，但是内存地址不通，还是两个不同的键
+    console.log(objMap.get(k2));//222
+    //下面是几个特别的值
+    objMap.set(-0, 123);
+    console.log(objMap.get(0));//-0和0（+0）相等
+
+    objMap.set(true, 111);
+    console.log(objMap.get('true'));//true 和 'true' 不等
+
+    objMap.set(NaN, 123);
+    console.log(objMap.get(NaN));//NaN是同一个
+
+    objMap.set(undefined, 123);
+    objMap.set(null, 3333);//undefined 和 null 不同
+    console.log(objMap.get(undefined));
+    console.log(objMap.get(null));
+    /**
+     * 对应的属性和操作方法和Set的操作一致，就不举例了
+     * size
+     * set
+     * get
+     * has
+     * delete
+     * clear
+     * 遍历方法，和Set的用法也一样
+     * keys
+     * values
+     * entries
+     * forEach
+     */
+
+    //与其他数据结构的互相转换
+    console.log("Map 转为数组")
+    const turnMap1 = new Map().set(true, 1).set({'foo': 'bar'}, [1,2])
+    console.log([...turnMap1]);// [Array(2), Array(2)] [[true, 1], [{foo: "bar"},[1, 2]]]
+
+    console.log("数组 转为Map")
+    const trunMap2 = new Map([[1,2], [3,4]])
+    console.log(trunMap2);//{1 => 2, 3 => 4}
+
+    console.log("Map 转为Object")
+    function strMapToObj(strMap){
+        let obj = Object.create(null);
+        for(let [key, value] of strMap){
+            obj[key] = value
+        }
+        return obj
+    }
+
+    const strMap = new Map().set('test1',123).set('test2','test');
+    console.log(strMapToObj(strMap));//{test1: 123, test2: "test"}
+
+    console.log("Object 转为Map")
+    function objToStrMap(obj){
+        let strMap = new Map();
+        for(let key of Object.keys(obj)){
+            strMap.set(key, obj[key])
+        }
+        return strMap
+    }
+    console.log(objToStrMap({'test1':123, 'test2': 'test'}));//Map(2) {"test1" => 123, "test2" => "test"}
+
+    console.log("Map 转为Json")
+    //strMap
+    console.log(JSON.stringify(strMapToObj(strMap)));//{"test1":123,"test2":"test"}
+    //objMap
+    console.log(JSON.stringify([...objMap]));//[[["a"],111],[["a"],222],[0,123],[true,111],[null,123],[null,123],[null,3333]]
+
+    console.log("Json 转为Map")
+    //strMap
+    console.log(objToStrMap(JSON.parse('{"test1":123,"test2":"test"}')));
+    //objMap
+    console.log(new Map(JSON.parse('[[true,1],[["foo","bar"]]]')));
+
+
+    console.log("==================WeakMap==================")
 </script>
 
 </html>
