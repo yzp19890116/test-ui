@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proxy：代理</title>
+</head>
+<body>
+
+</body>
+<script>
+    console.log("==================ES6 原生提供 Proxy 构造函数，用来生成 Proxy 实例。var proxy = new Proxy(target, handler);==================")
+    var kObj = new Proxy({}, {
+        get: function(target, key, receiver){
+            console.log(`getting ${key}`);
+            return Reflect.get(target, key, receiver)
+        },
+        set: function(target, key, value, receiver){
+            console.log(`setting ${key}`);
+            return Reflect.set(target, key, value, receiver)
+        }
+    })
+
+    kObj.count = 1//setting count
+    ++kObj.count//getting count + setting count
+    kObj['test1'] = 1;//setting test1
+
+    //上个设置多拦截的例子
+    var handler = {
+        //拦截对象属性的读取
+        get: function(targer, key, receiver){
+            if(key === 'prototype'){
+                return Object.prototype
+            }
+            return 'hello: ' + key;
+        },
+        //拦截 Proxy 实例作为函数调用的操作
+        apply(targer, object, args){
+            return args[0]
+        },
+        //拦截 Proxy 实例作为构造函数调用的操作
+        construct(targer, args){
+            return {value: args[1]}
+        },
+    }
+
+
+
+    console.log("==================对数方法，正余弦方法、指数运算符==================")
+</script>
+</html>
